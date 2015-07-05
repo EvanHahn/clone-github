@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+require 'octokit'
+require 'open4'
+
+ACCESS_TOKEN = ENV['CLONE_GITHUB_TOKEN']
+if ACCESS_TOKEN.nil?
+  $stderr.puts 'Please set the CLONE_GITHUB_TOKEN environment variable.'
+  exit 1
+end
+
+if ARGV.empty?
+  puts 'Usage: clone-github username1 username2 etc...'
+  exit 0
+end
+
+client = Octokit::Client.new(:access_token => ACCESS_TOKEN)
+
+ARGV.each do |username|
+  user = client.user(username)
+  repos = user.rels[:repos].get.data
+
+  unless repos.empty?
+    `mkdir -p #{username}`
+  end
+
+  repos.each do |repo|
+    repo_folder = repo[:full_name]
+
+    if Dir.exists? repo_folder
+      print "updating #{repo_folder}..."
+      command = "cd #{repo_folder} && git pull && cd -"
+    else
+      print "cloning #{repo_folder}..."
+      command = "git clone #{repo[:clone_url]} #{repo[:full_name]}"
+    end
+
+    pid = Open4::popen4(command).first
+    _, status = Process::waitpid2 pid
+    exitstatus = status.exitstatus
+
+    if exitstatus == 0
+      puts 'done'
+    else
+      puts "ERROR #{exitstatus}!"
+    end
+  end
+end
