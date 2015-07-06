@@ -17,9 +17,18 @@ client = Octokit::Client.new(:access_token => ACCESS_TOKEN)
 
 ARGV.each do |username|
   user = client.user(username)
-  repos = user.rels[:repos].get.data
+
+  repos = []
+  rel = user.rels[:repos]
+  loop do
+    result = rel.get
+    repos += result.data
+    break unless result.rels.include? :next
+    rel = result.rels[:next]
+  end
 
   unless repos.empty?
+    puts "cloning #{username}'s #{repos.length} repos"
     `mkdir -p #{username}`
   end
 
