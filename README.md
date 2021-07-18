@@ -1,12 +1,10 @@
-clone GitHub
-============
+# clone GitHub
 
-I read [this article](http://www.wired.com/2015/06/problem-putting-worlds-code-github/) and thought, "perhaps I should make it easy to back up GitHub repos, just in case".
+I read [this article](https://www.wired.com/2015/06/problem-putting-worlds-code-github/) and thought, "perhaps I should make it easy to back up GitHub repos, just in case".
 
-running this
-------------
+## running this
 
-1. Install [Bundler](http://bundler.io/) (which requires Ruby)
+1. Install [Bundler](https://bundler.io/) (which requires Ruby)
 2. Make yourself a [personal GitHub access token](https://github.com/settings/tokens) and write it down
 3. Run `bundle install` in this directory
 
